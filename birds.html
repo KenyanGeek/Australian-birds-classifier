@@ -13089,7 +13089,7 @@ div#notebook {
 
 <!-- Loading mathjax macro -->
 <!-- Load mathjax -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_HTML"></script>
     <!-- MathJax configuration -->
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -13137,10 +13137,11 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[70]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">fastai.vision</span> <span class="k">import</span> <span class="o">*</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">fastai.vision</span> <span class="k">import</span> <span class="n">verify_images</span><span class="p">,</span> <span class="n">ImageDataBunch</span><span class="p">,</span> <span class="n">cnn_learner</span><span class="p">,</span> <span class="n">ClassificationInterpretation</span><span class="p">,</span> <span class="n">ImageList</span>
+<span class="kn">from</span> <span class="nn">fastai.widgets</span> <span class="k">import</span> <span class="n">DatasetFormatter</span><span class="p">,</span> <span class="n">ImageCleaner</span>
 </pre></div>
 
     </div>
@@ -13150,11 +13151,13 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[71]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="s1">&#39;galah&#39;</span>
-<span class="n">file</span> <span class="o">=</span> <span class="s1">&#39;urls_galah.csv&#39;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">folders</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;galah&#39;</span><span class="p">,</span> <span class="s1">&#39;kookaburra&#39;</span><span class="p">,</span> <span class="s1">&#39;cockatoo&#39;</span><span class="p">,</span> <span class="s1">&#39;lorikeet&#39;</span><span class="p">,</span> <span class="s1">&#39;magpie&#39;</span><span class="p">,</span> <span class="s1">&#39;gull&#39;</span><span class="p">]</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;urls_galah.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;urls_kookaburra.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;urls_cockatoo.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;urls_lorikeet.csv&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;urls_magpie.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;urls_gull.csv&#39;</span><span class="p">]</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/birds&#39;</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13164,25 +13167,13 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[72]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/birds&#39;</span><span class="p">)</span>
-<span class="n">dest</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">folder</span>
-<span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[73]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">download_images</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">file</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">max_pics</span><span class="o">=</span><span class="mi">700</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">folders</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+    <span class="n">dest</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">folder</span>
+    <span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">download_images</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">file</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">max_pics</span><span class="o">=</span><span class="mi">700</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13215,7 +13206,7 @@ div#notebook {
             }
         </style>
       <progress value='400' class='' max='400', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      100.00% [400/400 00:31<00:00]
+      100.00% [400/400 00:33<00:00]
     </div>
     
 </div>
@@ -13232,55 +13223,6 @@ div#notebook {
 </pre>
 </div>
 </div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[74]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="s1">&#39;kookaburra&#39;</span>
-<span class="n">file</span> <span class="o">=</span> <span class="s1">&#39;urls_kookaburra.csv&#39;</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[75]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/birds&#39;</span><span class="p">)</span>
-<span class="n">dest</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">folder</span>
-<span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[76]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">download_images</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">file</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">max_pics</span><span class="o">=</span><span class="mi">700</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
 
 <div class="output_area">
 
@@ -13304,7 +13246,7 @@ div#notebook {
             }
         </style>
       <progress value='644' class='' max='644', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      100.00% [644/644 00:55<00:00]
+      100.00% [644/644 00:53<00:00]
     </div>
     
 </div>
@@ -13317,60 +13259,11 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Error https://thumbor.abcopen.net.au/7jNUuauNGqJdUuLrBJuAVyQESSY=/970x596/smart/https://uploads-abcopen.s3.amazonaws.com/assets/uploads/138427.jpg HTTPSConnectionPool(host=&#39;thumbor.abcopen.net.au&#39;, port=443): Read timed out. (read timeout=4)
+<pre>Error https://www.picclickimg.com/d/l400/pict/122530359590_/Kookaburra-Souvenir-Pewter-Fridge-Magnet-Australiana-Gift-Australian.jpg HTTPSConnectionPool(host=&#39;www.picclickimg.com&#39;, port=443): Read timed out. (read timeout=4)
 Error x-raw-image:///e9249c7c049aa426d58b5e542e45fe0ffe71abc7a860e3992baaa64a8bc0f9d9 No connection adapters were found for &#39;x-raw-image:///e9249c7c049aa426d58b5e542e45fe0ffe71abc7a860e3992baaa64a8bc0f9d9&#39;
 </pre>
 </div>
 </div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[77]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="s1">&#39;cockatoo&#39;</span>
-<span class="n">file</span> <span class="o">=</span> <span class="s1">&#39;urls_cockatoo.csv&#39;</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[78]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/birds&#39;</span><span class="p">)</span>
-<span class="n">dest</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">folder</span>
-<span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[79]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">download_images</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">file</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">max_pics</span><span class="o">=</span><span class="mi">700</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
 
 <div class="output_area">
 
@@ -13394,7 +13287,7 @@ Error x-raw-image:///e9249c7c049aa426d58b5e542e45fe0ffe71abc7a860e3992baaa64a8bc
             }
         </style>
       <progress value='688' class='' max='688', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      100.00% [688/688 00:57<00:00]
+      100.00% [688/688 00:59<00:00]
     </div>
     
 </div>
@@ -13407,12 +13300,12 @@ Error x-raw-image:///e9249c7c049aa426d58b5e542e45fe0ffe71abc7a860e3992baaa64a8bc
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Error https://www.petguide.com/wp-content/uploads/2018/07/lesser-sulphur-crested-cockatoo.jpg HTTPConnectionPool(host=&#39;127.0.0.1&#39;, port=80): Max retries exceeded with url: / (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f3d799ca748&gt;: Failed to establish a new connection: [Errno 111] Connection refused&#39;,))
-Error https://www.petguide.com/wp-content/uploads/2018/10/sulphur-crested-cockatoo.jpg HTTPConnectionPool(host=&#39;127.0.0.1&#39;, port=80): Max retries exceeded with url: / (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f3d799bcd68&gt;: Failed to establish a new connection: [Errno 111] Connection refused&#39;,))
-Error https://www.petguide.com/wp-content/uploads/2018/07/greater-sulphur-crested-cockatoo-2.jpg HTTPConnectionPool(host=&#39;127.0.0.1&#39;, port=80): Max retries exceeded with url: / (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f3d799f63c8&gt;: Failed to establish a new connection: [Errno 111] Connection refused&#39;,))
+<pre>Error https://www.petguide.com/wp-content/uploads/2018/07/lesser-sulphur-crested-cockatoo.jpg HTTPConnectionPool(host=&#39;127.0.0.1&#39;, port=80): Max retries exceeded with url: / (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f53fc5d67b8&gt;: Failed to establish a new connection: [Errno 111] Connection refused&#39;,))
+Error https://www.petguide.com/wp-content/uploads/2018/10/sulphur-crested-cockatoo.jpg HTTPConnectionPool(host=&#39;127.0.0.1&#39;, port=80): Max retries exceeded with url: / (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f53fc636f28&gt;: Failed to establish a new connection: [Errno 111] Connection refused&#39;,))
+Error https://www.petguide.com/wp-content/uploads/2018/07/greater-sulphur-crested-cockatoo-2.jpg HTTPConnectionPool(host=&#39;127.0.0.1&#39;, port=80): Max retries exceeded with url: / (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f53fc4d7d30&gt;: Failed to establish a new connection: [Errno 111] Connection refused&#39;,))
 Error x-raw-image:///fe6e86f58352803286c797ea685d0387c3379c5e80a8f5df2b2aea04c1748d50 No connection adapters were found for &#39;x-raw-image:///fe6e86f58352803286c797ea685d0387c3379c5e80a8f5df2b2aea04c1748d50&#39;
 Error x-raw-image:///d54dcfe55dea5b6f98b54c9476ca0da78aedcc0dffbd283aa8bf8c27c8292eda No connection adapters were found for &#39;x-raw-image:///d54dcfe55dea5b6f98b54c9476ca0da78aedcc0dffbd283aa8bf8c27c8292eda&#39;
-Error https://www.petguide.com/wp-content/uploads/2018/07/greater-sulphur-crested-cockatoo-1-240x300.jpg HTTPConnectionPool(host=&#39;127.0.0.1&#39;, port=80): Max retries exceeded with url: / (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f3d799c9278&gt;: Failed to establish a new connection: [Errno 111] Connection refused&#39;,))
+Error https://www.petguide.com/wp-content/uploads/2018/07/greater-sulphur-crested-cockatoo-1-240x300.jpg HTTPConnectionPool(host=&#39;127.0.0.1&#39;, port=80): Max retries exceeded with url: / (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f53fc5e27b8&gt;: Failed to establish a new connection: [Errno 111] Connection refused&#39;,))
 </pre>
 </div>
 </div>
@@ -13449,55 +13342,6 @@ And re-run your code once the download is successful
 </div>
 </div>
 
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[80]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="s1">&#39;lorikeet&#39;</span>
-<span class="n">file</span> <span class="o">=</span> <span class="s1">&#39;urls_lorikeet.csv&#39;</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[81]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/birds&#39;</span><span class="p">)</span>
-<span class="n">dest</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">folder</span>
-<span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[82]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">download_images</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">file</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">max_pics</span><span class="o">=</span><span class="mi">700</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
 <div class="output_area">
 
     <div class="prompt"></div>
@@ -13520,7 +13364,7 @@ And re-run your code once the download is successful
             }
         </style>
       <progress value='611' class='' max='611', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      100.00% [611/611 00:43<00:00]
+      100.00% [611/611 00:42<00:00]
     </div>
     
 </div>
@@ -13533,62 +13377,12 @@ And re-run your code once the download is successful
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Error https://www.burkesbackyard.com.au/wp-content/uploads/2013/09/Feeding-Lorikeets.jpg HTTPSConnectionPool(host=&#39;www.burkesbackyard.com.au&#39;, port=443): Read timed out. (read timeout=4)
-Error http://swarovskicrystalfigurines.com/wp-content/image/Swarovski_Figurine_2016_RAINBOW_LORIKEET_BIRD_02_fp.jpg HTTPConnectionPool(host=&#39;swarovskicrystalfigurines.com&#39;, port=80): Max retries exceeded with url: /wp-content/image/Swarovski_Figurine_2016_RAINBOW_LORIKEET_BIRD_02_fp.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f3d799bde48&gt;: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution&#39;,))
-Error https://www.picclickimg.com/00/s/NzY5WDY2Mw==/z/inkAAOSwcEtZkmX~/$/Dinki-Di-Rainbow-Lorikeet-Bird-Plush-Toy-Soft-_1.jpg HTTPSConnectionPool(host=&#39;www.picclickimg.com&#39;, port=443): Read timed out. (read timeout=4)
+<pre>Error https://www.ari.vic.gov.au/__data/assets/image/0035/79298/cit-science_rainbow-lorikeet-pmenkhorst.jpg HTTPSConnectionPool(host=&#39;www.ari.vic.gov.au&#39;, port=443): Read timed out. (read timeout=4)
+Error http://swarovskicrystalfigurines.com/wp-content/image/Swarovski_Figurine_2016_RAINBOW_LORIKEET_BIRD_02_fp.jpg HTTPConnectionPool(host=&#39;swarovskicrystalfigurines.com&#39;, port=80): Max retries exceeded with url: /wp-content/image/Swarovski_Figurine_2016_RAINBOW_LORIKEET_BIRD_02_fp.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f53fc52e198&gt;: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution&#39;,))
 Error https://www.10wallpaper.com/wallpaper/1920x1200/1411/Rainbow_Lorikeet_Bird-Animal_Photo_Wallpaper_1920x1200.jpg HTTPSConnectionPool(host=&#39;www.10wallpaper.com&#39;, port=443): Max retries exceeded with url: /wallpaper/1920x1200/1411/Rainbow_Lorikeet_Bird-Animal_Photo_Wallpaper_1920x1200.jpg (Caused by SSLError(SSLError(&#34;bad handshake: SysCallError(-1, &#39;Unexpected EOF&#39;)&#34;,),))
 </pre>
 </div>
 </div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[83]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="s1">&#39;magpie&#39;</span>
-<span class="n">file</span> <span class="o">=</span> <span class="s1">&#39;urls_magpie.csv&#39;</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[84]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/birds&#39;</span><span class="p">)</span>
-<span class="n">dest</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">folder</span>
-<span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[85]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">download_images</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">file</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">max_pics</span><span class="o">=</span><span class="mi">700</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
 
 <div class="output_area">
 
@@ -13612,7 +13406,7 @@ Error https://www.10wallpaper.com/wallpaper/1920x1200/1411/Rainbow_Lorikeet_Bird
             }
         </style>
       <progress value='674' class='' max='674', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      100.00% [674/674 00:40<00:00]
+      100.00% [674/674 00:43<00:00]
     </div>
     
 </div>
@@ -13626,61 +13420,13 @@ Error https://www.10wallpaper.com/wallpaper/1920x1200/1411/Rainbow_Lorikeet_Bird
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Error x-raw-image:///16a5090b296c80e1fefa2902b8bdeb1f8c51514574d77bf57b1a1f17bde49023 No connection adapters were found for &#39;x-raw-image:///16a5090b296c80e1fefa2902b8bdeb1f8c51514574d77bf57b1a1f17bde49023&#39;
-Error https://uno-envivio.netdna-ssl.com/wp-content/uploads/bb-plugin/cache/Birds-Yellow-Billed-Magpie-square.jpg HTTPSConnectionPool(host=&#39;uno-envivio.netdna-ssl.com&#39;, port=443): Max retries exceeded with url: /wp-content/uploads/bb-plugin/cache/Birds-Yellow-Billed-Magpie-square.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.VerifiedHTTPSConnection object at 0x7f3d799bc198&gt;: Failed to establish a new connection: [Errno -2] Name or service not known&#39;,))
-Error http://vs-images.johngreedjewellery.com/images/silver-magpie-bird-charm-1042-041-1-p33117-248852_image.jpg HTTPConnectionPool(host=&#39;vs-images.johngreedjewellery.com&#39;, port=80): Max retries exceeded with url: /images/silver-magpie-bird-charm-1042-041-1-p33117-248852_image.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f3d799db128&gt;: Failed to establish a new connection: [Errno -2] Name or service not known&#39;,))
-Error https://thumbor.abcopen.net.au/IutpNyBffLndFqJy0NQL6GHbjtY=/0x0:640x640/970x970/https://scontent.cdninstagram.com/t51.2885-15/s640x640/sh0.08/e35/25013787_1738882129751872_9057617420562202624_n.jpg HTTPSConnectionPool(host=&#39;thumbor.abcopen.net.au&#39;, port=443): Read timed out. (read timeout=4)
+Error https://uno-envivio.netdna-ssl.com/wp-content/uploads/bb-plugin/cache/Birds-Yellow-Billed-Magpie-square.jpg HTTPSConnectionPool(host=&#39;uno-envivio.netdna-ssl.com&#39;, port=443): Max retries exceeded with url: /wp-content/uploads/bb-plugin/cache/Birds-Yellow-Billed-Magpie-square.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.VerifiedHTTPSConnection object at 0x7f53fc4bc860&gt;: Failed to establish a new connection: [Errno -2] Name or service not known&#39;,))
+Error https://www.thisiscolossal.com/wp-content/uploads/2015/03/penguin03.jpg HTTPSConnectionPool(host=&#39;www.thisiscolossal.com&#39;, port=443): Max retries exceeded with url: /wp-content/uploads/2015/03/penguin03.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.VerifiedHTTPSConnection object at 0x7f53fc544ac8&gt;: Failed to establish a new connection: [Errno 101] Network is unreachable&#39;,))
+Error https://dutchreview.com/wp-content/uploads/Magpie-Klaas-Schoof-Amsterdam-2017.jpg HTTPSConnectionPool(host=&#39;dutchreview.com&#39;, port=443): Max retries exceeded with url: /wp-content/uploads/Magpie-Klaas-Schoof-Amsterdam-2017.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.VerifiedHTTPSConnection object at 0x7f53fc4bb9b0&gt;: Failed to establish a new connection: [Errno 101] Network is unreachable&#39;,))
+Error http://vs-images.johngreedjewellery.com/images/silver-magpie-bird-charm-1042-041-1-p33117-248852_image.jpg HTTPConnectionPool(host=&#39;vs-images.johngreedjewellery.com&#39;, port=80): Max retries exceeded with url: /images/silver-magpie-bird-charm-1042-041-1-p33117-248852_image.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f53fc4b9668&gt;: Failed to establish a new connection: [Errno -2] Name or service not known&#39;,))
 </pre>
 </div>
 </div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[86]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="s1">&#39;gull&#39;</span>
-<span class="n">file</span> <span class="o">=</span> <span class="s1">&#39;urls_gull.csv&#39;</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[87]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/birds&#39;</span><span class="p">)</span>
-<span class="n">dest</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">folder</span>
-<span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[88]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">download_images</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">file</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">max_pics</span><span class="o">=</span><span class="mi">700</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
 
 <div class="output_area">
 
@@ -13704,7 +13450,7 @@ Error https://thumbor.abcopen.net.au/IutpNyBffLndFqJy0NQL6GHbjtY=/0x0:640x640/97
             }
         </style>
       <progress value='600' class='' max='600', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      100.00% [600/600 00:46<00:00]
+      100.00% [600/600 00:44<00:00]
     </div>
     
 </div>
@@ -13718,13 +13464,13 @@ Error https://thumbor.abcopen.net.au/IutpNyBffLndFqJy0NQL6GHbjtY=/0x0:640x640/97
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Error https://proof.arkive.org/media/BA/BAACBD24-B0FC-4063-88D4-D958D7218E9A/Presentation.Large/silver-gull-adult-with-two-chicks.jpg HTTPSConnectionPool(host=&#39;proof.arkive.org&#39;, port=443): Max retries exceeded with url: /media/BA/BAACBD24-B0FC-4063-88D4-D958D7218E9A/Presentation.Large/silver-gull-adult-with-two-chicks.jpg (Caused by SSLError(SSLError(&#34;bad handshake: Error([(&#39;SSL routines&#39;, &#39;ssl3_read_bytes&#39;, &#39;sslv3 alert handshake failure&#39;)],)&#34;,),))
-Error https://www.waratahsoftware.com.au/images/birds/fi_silvergull_p1250184.jpg HTTPSConnectionPool(host=&#39;www.waratahsoftware.com.au&#39;, port=443): Max retries exceeded with url: /images/birds/fi_silvergull_p1250184.jpg (Caused by ConnectTimeoutError(&lt;urllib3.connection.VerifiedHTTPSConnection object at 0x7f3d799b77b8&gt;, &#39;Connection to www.waratahsoftware.com.au timed out. (connect timeout=4)&#39;))
+Error https://www.waratahsoftware.com.au/images/birds/fi_silvergull_p1250184.jpg HTTPSConnectionPool(host=&#39;www.waratahsoftware.com.au&#39;, port=443): Max retries exceeded with url: /images/birds/fi_silvergull_p1250184.jpg (Caused by ConnectTimeoutError(&lt;urllib3.connection.VerifiedHTTPSConnection object at 0x7f53fc4e0f60&gt;, &#39;Connection to www.waratahsoftware.com.au timed out. (connect timeout=4)&#39;))
 Error x-raw-image:///c46499da2cca71338381ebc9db604b69a6f17ef275df956e20016aadba1cb237 No connection adapters were found for &#39;x-raw-image:///c46499da2cca71338381ebc9db604b69a6f17ef275df956e20016aadba1cb237&#39;
-Error http://ian.muirhead.name/images/gallery/birds/silver-gull-2.jpg HTTPConnectionPool(host=&#39;ian.muirhead.name&#39;, port=80): Max retries exceeded with url: /images/gallery/birds/silver-gull-2.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f3d799bdda0&gt;: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution&#39;,))
-Error http://ian.muirhead.name/gallery/birds/ocean/images/silver-gull-3.jpg HTTPConnectionPool(host=&#39;ian.muirhead.name&#39;, port=80): Max retries exceeded with url: /gallery/birds/ocean/images/silver-gull-3.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f3d799bd748&gt;: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution&#39;,))
+Error http://ian.muirhead.name/images/gallery/birds/silver-gull-2.jpg HTTPConnectionPool(host=&#39;ian.muirhead.name&#39;, port=80): Max retries exceeded with url: /images/gallery/birds/silver-gull-2.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f53fc5c5080&gt;: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution&#39;,))
+Error http://ian.muirhead.name/gallery/birds/ocean/images/silver-gull-3.jpg HTTPConnectionPool(host=&#39;ian.muirhead.name&#39;, port=80): Max retries exceeded with url: /gallery/birds/ocean/images/silver-gull-3.jpg (Caused by NewConnectionError(&#39;&lt;urllib3.connection.HTTPConnection object at 0x7f53fc4c1358&gt;: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution&#39;,))
 Error https://prometheus.med.utah.edu/~bwjones/wp-content/uploads/2018/04/Silver-gull.jpg HTTPSConnectionPool(host=&#39;prometheus.med.utah.edu&#39;, port=443): Max retries exceeded with url: /~bwjones/wp-content/uploads/2018/04/Silver-gull.jpg (Caused by SSLError(SSLError(&#34;bad handshake: Error([(&#39;SSL routines&#39;, &#39;tls_process_server_certificate&#39;, &#39;certificate verify failed&#39;)],)&#34;,),))
-Error https://www.waratahsoftware.com.au/thumbnails/birds/tn_silvergull_DSC_5871.jpg HTTPSConnectionPool(host=&#39;www.waratahsoftware.com.au&#39;, port=443): Max retries exceeded with url: /thumbnails/birds/tn_silvergull_DSC_5871.jpg (Caused by ConnectTimeoutError(&lt;urllib3.connection.VerifiedHTTPSConnection object at 0x7f3d799b7a20&gt;, &#39;Connection to www.waratahsoftware.com.au timed out. (connect timeout=4)&#39;))
-Error https://www.waratahsoftware.com.au/thumbnails/birds/tn_silvergull_p1250184.jpg HTTPSConnectionPool(host=&#39;www.waratahsoftware.com.au&#39;, port=443): Max retries exceeded with url: /thumbnails/birds/tn_silvergull_p1250184.jpg (Caused by ConnectTimeoutError(&lt;urllib3.connection.VerifiedHTTPSConnection object at 0x7f3d799dbf28&gt;, &#39;Connection to www.waratahsoftware.com.au timed out. (connect timeout=4)&#39;))
+Error https://www.waratahsoftware.com.au/thumbnails/birds/tn_silvergull_DSC_5871.jpg HTTPSConnectionPool(host=&#39;www.waratahsoftware.com.au&#39;, port=443): Max retries exceeded with url: /thumbnails/birds/tn_silvergull_DSC_5871.jpg (Caused by ConnectTimeoutError(&lt;urllib3.connection.VerifiedHTTPSConnection object at 0x7f53fc4e0c18&gt;, &#39;Connection to www.waratahsoftware.com.au timed out. (connect timeout=4)&#39;))
+Error https://www.waratahsoftware.com.au/thumbnails/birds/tn_silvergull_p1250184.jpg HTTPSConnectionPool(host=&#39;www.waratahsoftware.com.au&#39;, port=443): Max retries exceeded with url: /thumbnails/birds/tn_silvergull_p1250184.jpg (Caused by ConnectTimeoutError(&lt;urllib3.connection.VerifiedHTTPSConnection object at 0x7f53fc5f3588&gt;, &#39;Connection to www.waratahsoftware.com.au timed out. (connect timeout=4)&#39;))
 </pre>
 </div>
 </div>
@@ -15085,19 +14831,6 @@ Total time: 00:46 <p><table border="1" class="dataframe">
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[119]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">fastai.widgets</span> <span class="k">import</span> <span class="o">*</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 <div class="prompt input_prompt">In&nbsp;[120]:</div>
 <div class="inner_cell">
     <div class="input_area">
@@ -15107,6 +14840,19 @@ Total time: 00:46 <p><table border="1" class="dataframe">
                    <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">get_transforms</span><span class="p">(),</span> <span class="n">size</span><span class="o">=</span><span class="mi">224</span><span class="p">)</span>
                    <span class="o">.</span><span class="n">databunch</span><span class="p">()</span>
      <span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">doc</span><span class="p">(</span><span class="n">ImageList</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -15167,10 +14913,10 @@ Total time: 00:46 <p><table border="1" class="dataframe">
 
  
  
-<div id="f775082c-38a0-4126-8f38-382a89ac2999"></div>
+<div id="b781778f-574e-4ce7-9d96-3c1221de6a71"></div>
 <div class="output_subarea output_widget_view ">
 <script type="text/javascript">
-var element = $('#f775082c-38a0-4126-8f38-382a89ac2999');
+var element = $('#b781778f-574e-4ce7-9d96-3c1221de6a71');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "f43f1a4ad46b415cb0bc4a214977308a", "version_major": 2, "version_minor": 0}
@@ -15189,10 +14935,10 @@ var element = $('#f775082c-38a0-4126-8f38-382a89ac2999');
 
  
  
-<div id="2c81bdf5-547e-4cc3-bed1-0f263bf61c87"></div>
+<div id="c06252a8-f539-45d1-945e-507935892922"></div>
 <div class="output_subarea output_widget_view ">
 <script type="text/javascript">
-var element = $('#2c81bdf5-547e-4cc3-bed1-0f263bf61c87');
+var element = $('#c06252a8-f539-45d1-945e-507935892922');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "7e408039a4f64a828661014d797ce610", "version_major": 2, "version_minor": 0}
@@ -15342,10 +15088,10 @@ var element = $('#2c81bdf5-547e-4cc3-bed1-0f263bf61c87');
 
  
  
-<div id="bafd4d7f-6515-4f5b-80c4-ece718661f7b"></div>
+<div id="62315cc4-503d-4be4-ab8d-b2c826e9bdde"></div>
 <div class="output_subarea output_widget_view ">
 <script type="text/javascript">
-var element = $('#bafd4d7f-6515-4f5b-80c4-ece718661f7b');
+var element = $('#62315cc4-503d-4be4-ab8d-b2c826e9bdde');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "ac9a49b4e5a24cce9636484cdaa62e58", "version_major": 2, "version_minor": 0}
@@ -15364,10 +15110,10 @@ var element = $('#bafd4d7f-6515-4f5b-80c4-ece718661f7b');
 
  
  
-<div id="5f9e4322-b129-4dd9-b589-4c22ac84b934"></div>
+<div id="790d7504-1b7f-4872-83d3-336d3500d674"></div>
 <div class="output_subarea output_widget_view ">
 <script type="text/javascript">
-var element = $('#5f9e4322-b129-4dd9-b589-4c22ac84b934');
+var element = $('#790d7504-1b7f-4872-83d3-336d3500d674');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "460441bda5da4151b9d633cf30692718", "version_major": 2, "version_minor": 0}
